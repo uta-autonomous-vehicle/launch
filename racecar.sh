@@ -1,9 +1,14 @@
 #!/bin/bash
 
+# trap "kill 0" SIGINT
+
+workon racecar
 source ~/racecar-ws/devel/setup.bash
 
-roslaunch racecar teleop.launch & \
-sleep 2 && roslaunch zed_wrapper zed.launch & \
+# echo "" > kill.txt
+
+roslaunch racecar teleop.launch  & \
+sleep 2 && roslaunch zed_wrapper zed.launch &  \
 sleep 2 && roslaunch urg_node urg_lidar.launch & \
 sleep 2 && rqt & \
 sleep 2 && rviz -d rviz/zed.rviz & \
