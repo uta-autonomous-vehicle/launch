@@ -7,7 +7,7 @@ if __name__ == "__main__":
 
     for i in open("kill.txt").read().split("\n"):
         if i:
-            print "kill {}".format(i)
+            print "kill -9 {}".format(i)
             try:
                 os.kill(int(i), signal.SIGINT)
             except:
