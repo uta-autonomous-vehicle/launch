@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="path" default="/media/nvidia/data/nov/bag/" />
+    <arg name="file_1" default="mapping__2020-11-07-18-55-23.bag" />
+
+    <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg path)$(arg file_1)"/>
+
+    <include file="zed_rtabmap.launch">
+        <arg name="launch_zed" value="false" />
+        <arg name="launch_racecar" value="false" />
+    </include>
+
+</launch>

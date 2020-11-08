@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<launch>
+    <node pkg="rosbag" type="record" name="rosbag_record_diag" args="record -o /media/nvidia/data/nov/bag/mapping_ -a"/>   
+
+    <include file="zed_rtabmap.launch">
+        <arg name="launch_rtabmap" value="false" />
+    </include>
+</launch>
