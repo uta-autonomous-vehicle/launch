@@ -14,7 +14,7 @@
   <arg name="serial_number"        	default="0" />
   <arg name="verbose"              	default="true" />
   <arg name="resolution"           	default="3" /> <!--0=RESOLUTION_HD2K, 1=RESOLUTION_HD1080, 2=RESOLUTION_HD720, 3=RESOLUTION_VGA -->
-  <arg name="frame_rate"           	default="60" />
+  <arg name="frame_rate"           	default="100" />
 
   <!-- RESOLUTION_HD2K   -> 2208*1242, available framerates: 15 fps.
        RESOLUTION_HD1080 -> 1920*1080, available framerates: 15, 30 fps.
@@ -37,6 +37,9 @@
 			<arg name="racecar_version" value="$(arg racecar_version)" />
 			<arg name="run_camera" value="$(arg run_camera)" />
 		</include>
+
+		<!-- <include file="$(find uta_racecar)/launch/racecar_launch.launch">
+		</include> -->
 	</group>
 
 		<!-- ZED Wrapper Node-->
@@ -54,28 +57,34 @@
 			<arg name="rgb_info_topic"       	value="$(arg camera_info_topic)" />
 			<arg name="depth_cam_info_topic" 	value="$(arg depth_camera_info_topic)" />
 			<arg name="base_frame"            value="$(arg camera_frame)" />
+
+			<!-- <param name="point_cloud_topic"         value="point_cloud/cloud_registered" /> -->
 		</include>
   </group>
 	
 	<!-- RTAB-map Node-->
 	<group if="$(arg launch_rtabmap)">
 		<include file="$(find rtabmap_ros)/launch/rtabmap.launch">
+			<arg name="subscribe_scan_cloud"    default="true"/>
+  			<arg name="scan_cloud_topic"        default="/zed/point_cloud/cloud_registered"/>
+
 			<arg name="rtabmap_args"		        value="--delete_db_on_start" />
 			<arg name="rgb_topic"               	value="$(arg rgb_topic)" />
 			<arg name="depth_topic"             	value="$(arg depth_topic)" />
 			<arg name="camera_info_topic"       	value="$(arg camera_info_topic)" />
 			<arg name="depth_camera_info_topic" 	value="$(arg depth_camera_info_topic)" />
 			<arg name="frame_id"                  value="$(arg camera_frame)" />
+			<arg name="odom_topic" 				value="/zed/odom" />
 			<arg name="queue_size"              default="100000"/>
 			<arg name="database_path"           default="/media/nvidia/data/nov/0_res/rtabmap.db"/>
-			<arg name="rtabmapviz"              default="false" />
+			<arg name="rtabmapviz"              default="true" />
 			<arg name="localization"            default="false"/>
 
 			<arg name="rviz"                    default="true" />
 			<arg name="rviz_cfg"                default="/home/nvidia/racecar/launch/rviz/rtabmap.rviz" />
 		</include>
 
-		<!-- Create point cloud for the local planner -->
+		<!-- Create point cloud for the local planner --> 
       <node pkg="nodelet" type="nodelet" name="obstacles_detection" args="load rtabmap_ros/obstacles_detection stereo_nodelet">
          <remap from="cloud" to="cloudXYZ"/>
          <remap from="obstacles" to="/planner_cloud"/>
