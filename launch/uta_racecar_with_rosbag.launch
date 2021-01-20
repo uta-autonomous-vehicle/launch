@@ -2,13 +2,16 @@
 <launch>
 
     <arg name="path" default="/media/nvidia/data/nov/bag/" />
-    <arg name="file_1" default="mapping__2020-11-07-18-55-23.bag" />
+    <arg name="source" default="mapping_low__2020-11-18-23-42-02.bag" />
 
-    <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg path)$(arg file_1)"/>
+    <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg path)$(arg source)"/>
 
     <include file="uta_racecar_mapping.launch">
-        <arg name="launch_zed" value="false" />
-        <arg name="launch_racecar" value="false" />
+        <arg name="zed" value="false" />
+        <arg name="racecar" value="false" />
+
+        <arg name="rtabmapviz"        default="false" />
+	    <arg name="rviz"              default="false" />
     </include>
 
 </launch>

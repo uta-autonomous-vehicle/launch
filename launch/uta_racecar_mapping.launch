@@ -2,19 +2,25 @@
 
 <launch>
 
-	<arg name="launch_rtabmap"        default="true" />
-	<arg name="launch_zed"        		default="true" />
-	<arg name="launch_racecar"        default="true" />
+<arg name="rtabmap"        	default="true" />
+<arg name="zed"        		default="true" />
+<arg name="racecar"        	default="true" />
+
+<arg name="db_file_name_prefix"        	default="" />
+<arg name="db_file_name"        	    default="$(arg db_file_name_prefix)rtabmap.db" />
+
+<arg name="rtabmapviz"          default="false" />
+<arg name="rviz"        		default="false" />
 
   <arg name="zed_namespace"		    	default="zed" />
 
   <arg name="svo_file"              	default="" /> <!-- <arg name="svo_file" default="path/to/svo/file.svo"> -->
 
-  <arg name="camera_model"         	default="1" /> <!-- 0=ZED, 1=ZEDM-->
+  <arg name="camera_model"         	default="0" /> <!-- 0=ZED, 1=ZEDM-->
   <arg name="serial_number"        	default="0" />
   <arg name="verbose"              	default="true" />
   <arg name="resolution"           	default="3" /> <!--0=RESOLUTION_HD2K, 1=RESOLUTION_HD1080, 2=RESOLUTION_HD720, 3=RESOLUTION_VGA -->
-  <arg name="frame_rate"           	default="100" />
+  <arg name="frame_rate"           	default="30" />
 
   <!-- RESOLUTION_HD2K   -> 2208*1242, available framerates: 15 fps.
        RESOLUTION_HD1080 -> 1920*1080, available framerates: 15, 30 fps.
@@ -32,10 +38,10 @@
 	<arg name="run_camera" default="false"/>
 
 
-	<group if="$(arg launch_racecar)">
-		<include file="$(find racecar)/launch/includes/$(arg racecar_version)-teleop.launch.xml">
-			<arg name="racecar_version" value="$(arg racecar_version)" />
-			<arg name="run_camera" value="$(arg run_camera)" />
+	<group if="$(arg racecar)">
+		<include file="$(find racecar)/launch/teleop.launch">
+			<!-- <arg name="racecar_version" value="$(arg racecar_version)" />
+			<arg name="run_camera" value="$(arg run_camera)" /> -->
 		</include>
 
 		<!-- <include file="$(find uta_racecar)/launch/racecar_launch.launch">
@@ -43,7 +49,7 @@
 	</group>
 
 		<!-- ZED Wrapper Node-->
-  <group ns="$(arg zed_namespace)" if="$(arg launch_zed)">
+  <group ns="$(arg zed_namespace)" if="$(arg zed)">
 		<include file="$(find zed_wrapper)/launch/zed_camera.launch">
 			<arg name="svo_file"            	value="$(arg svo_file)" />
 			<arg name="camera_model"        	value="$(arg camera_model)" />
@@ -51,23 +57,24 @@
 			<arg name="resolution"          	value="$(arg resolution)" />
 			<arg name="frame_rate"          	value="$(arg frame_rate)" />
 			<arg name="verbose"             	value="$(arg verbose)" />
-				
+		
 			<arg name="rgb_topic"             value="$(arg rgb_topic)" />
 			<arg name="depth_topic"           value="$(arg depth_topic)" />
 			<arg name="rgb_info_topic"       	value="$(arg camera_info_topic)" />
 			<arg name="depth_cam_info_topic" 	value="$(arg depth_camera_info_topic)" />
 			<arg name="base_frame"            value="$(arg camera_frame)" />
 
-			<!-- <param name="point_cloud_topic"         value="point_cloud/cloud_registered" /> -->
 		</include>
   </group>
 	
 	<!-- RTAB-map Node-->
-	<group if="$(arg launch_rtabmap)">
-		<include file="$(find rtabmap_ros)/launch/rtabmap.launch">
-			<arg name="subscribe_scan_cloud"    default="true"/>
-  			<arg name="scan_cloud_topic"        default="/zed/point_cloud/cloud_registered"/>
+	<group if="$(arg rtabmap)">
+		<!-- <include file="$(find rtabmap_ros)/launch/rtabmap.launch"> -->
+		<include file="rtabmap.launch">
+			<!-- <arg name="subscribe_scan_cloud"    default="true"/>
+  			<arg name="scan_cloud_topic"        default="/zed/point_cloud/cloud_registered"/> -->
 
+			<!-- <arg name="scan_topic"		        value="/scan" /> -->
 			<arg name="rtabmap_args"		        value="--delete_db_on_start" />
 			<arg name="rgb_topic"               	value="$(arg rgb_topic)" />
 			<arg name="depth_topic"             	value="$(arg depth_topic)" />
@@ -76,12 +83,16 @@
 			<arg name="frame_id"                  value="$(arg camera_frame)" />
 			<arg name="odom_topic" 				value="/zed/odom" />
 			<arg name="queue_size"              default="100000"/>
-			<arg name="database_path"           default="/media/nvidia/data/nov/0_res/rtabmap.db"/>
-			<arg name="rtabmapviz"              default="true" />
+			<arg name="database_path"           default="/media/nvidia/data/dec/$(arg db_file_name)"/>
+			<arg name="rtabmapviz"              default="$(arg rtabmapviz)" />
 			<arg name="localization"            default="false"/>
 
-			<arg name="rviz"                    default="true" />
+			<arg name="rviz"                    default="$(arg rviz)" />
 			<arg name="rviz_cfg"                default="/home/nvidia/racecar/launch/rviz/rtabmap.rviz" />
+			<arg name="approx_sync" 			value="false" />
+
+			<!-- <param name="scan_cloud"    value="scan" />
+			<param name="odom_frame_id"    value="base_link" /> -->
 		</include>
 
 		<!-- Create point cloud for the local planner --> 
